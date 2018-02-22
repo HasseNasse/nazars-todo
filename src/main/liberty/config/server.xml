@@ -1,25 +1,31 @@
 <server description="Sample Liberty server">
 
-  <featureManager>
+    <featureManager>
       <feature>microprofile-1.2</feature>
       <feature>servlet-3.1</feature>
       <feature>apiDiscovery-1.0</feature>
       <feature>jaxrs-2.0</feature>
-  </featureManager>
+      <feature>jndi-1.0</feature>
+      <feature>localConnector-1.0</feature>
+    </featureManager>
 
-  <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
+    <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
       id="defaultHttpEndpoint" host="*" />
 
-  <keyStore id="defaultKeyStore"/>
+    <keyStore id="defaultKeyStore"/>
 
-  <basicRegistry id="basic" realm="ibm/api">
+    <basicRegistry id="basic" realm="ibm/api">
       <user name="guest" password="password" />
-  </basicRegistry>
+    </basicRegistry>
 
 
-  <!-- Automatically expand WAR files and EAR files -->
-  <applicationManager autoExpand="true"/>
+    <!-- Automatically expand WAR files and EAR files -->
+    <applicationManager autoExpand="true"/>
 
-  <webApplication name="todo" location="${app.location}"/>
 
+    <!-- The dropins deployment feature is enabled and mbean is used as an updateTrigger
+        This is required by the Arquillian WLP extension. -->
+    <applicationMonitor dropinsEnabled="true" updateTrigger="mbean" />
+
+    <webApplication name="todo" location="${app.location}"/>
 </server>
