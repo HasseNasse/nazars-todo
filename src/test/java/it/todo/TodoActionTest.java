@@ -43,8 +43,8 @@ public class TodoActionTest extends EndpointTest{
     @Deployment
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "TodoActionTest.war")
-                .addPackage(DataSourceConnection.class.getPackage())
-                .addPackage(Todo.class.getPackage())
+                .addClasses(Todo.class, TodoAction.class, TodoService.class,
+                        TodoDAO.class, DataSourceConnection.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
