@@ -14,6 +14,8 @@ public class EndpointTest {
     protected String war = System.getProperty("war.context");
     protected String url = "http://" + dns + ":" + port + "/" + war;
 
+    protected Client client = ClientBuilder.newClient();
+
     public void testEndpoint(String endpoint, String expectedOutput) {
         String url = this.url + endpoint;
         System.out.println("Testing " + url);
@@ -28,20 +30,18 @@ public class EndpointTest {
     }
 
     public Response sendRequest(String url, String requestType) {
-        Client client = ClientBuilder.newClient();
         System.out.println("Testing " + url);
-        WebTarget target = client.target(url);
+        WebTarget target = this.client.target(url);
         Invocation.Builder invoBuild = target.request();
         Response response = invoBuild.build(requestType).invoke();
         return response;
     }
 
-    public Response sendPostRequest(String url, String data){
-        Client client = ClientBuilder.newClient();
+    public Response sendPostRequest(String url, String jsonData){
         System.out.println("Testing " + url);
-        WebTarget target = client.target(url);
+        WebTarget target = this.client.target(url);
         Invocation.Builder invoBuild = target.request(MediaType.APPLICATION_JSON);
-        Response response = invoBuild.post(Entity.entity(data, MediaType.APPLICATION_JSON));
+        Response response = invoBuild.post(Entity.entity(jsonData, MediaType.APPLICATION_JSON));
         return response;
     }
 }

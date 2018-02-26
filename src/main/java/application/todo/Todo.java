@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
 @Entity(value="todos", noClassnameStored = true)
-@XmlRootElement
 public class Todo {
     @Id private ObjectId id;
     private String todo;

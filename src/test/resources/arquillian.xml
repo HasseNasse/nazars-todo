@@ -1,0 +1,18 @@
+<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://jboss.org/schema/arquillian"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian
+            http://jboss.org/schema/arquillian/arquillian_1_0.xsd
+    http://jboss.org/schema/arquillian ">
+    <engine>
+        <property name="deploymentExportPath">target/</property>
+    </engine>
+    <container qualifier="wlp-managed-85" default="true">
+        <configuration>
+            <property name="wlpHome">target/liberty/wlp</property>
+            <property name="serverName">defaultServer</property>
+            <property name="httpPort">9080</property>
+            <property name="appDeployTimeout">20</property>
+            <property name="appUndeployTimeout">20</property>
+        </configuration>
+    </container>
+</arquillian>
