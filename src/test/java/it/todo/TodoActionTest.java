@@ -1,5 +1,7 @@
 package it.todo;
 
+import application.JaxrsApplication;
+import application.datastore.DAO;
 import application.datastore.DataSourceConnection;
 import application.todo.Todo;
 import application.todo.TodoAction;
@@ -12,18 +14,25 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.slf4j.event.Level;
+import qualifiers.Action;
 import qualifiers.Repository;
+import qualifiers.Service;
 
 import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.core.Response;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -36,16 +45,33 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 @RunWith(Arquillian.class)
 public class TodoActionTest extends EndpointTest{
+
     ObjectId id1, id2, id3;
     private final String endpoint = "/rest/todo";
     private static Jsonb jsonb;
 
     @Deployment
     public static WebArchive createDeployment() {
-        return ShrinkWrap.create(WebArchive.class, "TodoActionTest.war")
-                .addClasses(Todo.class, TodoAction.class, TodoService.class,
-                        TodoDAO.class, DataSourceConnection.class)
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+        File[] files = Maven.resolver().loadPomFromFile("pom.xml")
+                .importRuntimeDependencies().resolve().withTransitivity().asFile();
+
+        WebArchive warch = ShrinkWrap.create(WebArchive.class, "test.war")
+                .addClasses(DAO.class,
+                        Todo.class,
+                        TodoAction.class,
+                        TodoService.class,
+                        TodoDAO.class,
+                        DataSourceConnection.class,
+                        JaxrsApplication.class,
+                        Action.class,
+                        Repository.class,
+                        Service.class,
+                        EndpointTest.class)
+                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+                .addAsLibraries(files);
+
+        System.out.println(warch);
+        return warch;
     }
 
     private @Inject DataSourceConnection DBcon;
