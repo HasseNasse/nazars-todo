@@ -9,9 +9,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public class EndpointTest {
-    protected String dns = System.getProperty("app.dns");
-    protected String port = System.getProperty("liberty.test.port");
-    protected String war = System.getProperty("war.context");
+    // TODO: 2018-02-28  Extract out to properties file
+    protected String dns = "localhost";
+    protected String port = "9080";
+    protected String war = "test";
     protected String url = "http://" + dns + ":" + port + "/" + war;
 
     protected Client client = ClientBuilder.newClient();

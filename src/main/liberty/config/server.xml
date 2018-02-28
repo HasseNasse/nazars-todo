@@ -1,4 +1,4 @@
-<server description="Sample Liberty server">
+<server description="Todo App Server">
 
     <featureManager>
       <feature>microprofile-1.2</feature>

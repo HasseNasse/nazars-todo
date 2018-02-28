@@ -4,7 +4,7 @@
 
     <groupId>net.nazarsit</groupId>
     <artifactId>todo</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.10</version>
     <packaging>war</packaging>
 
     <!-- contains default pluginManagement configuration for liberty-maven-plugin -->
@@ -239,6 +239,7 @@
                     <jvmOptionsFile>${basedir}/src/main/liberty/config/jvm.options</jvmOptionsFile>
                     <packageFile>${package.file}</packageFile>
                     <include>${packaging.type}</include>
+                    <installAppPackages>project</installAppPackages>
                     <bootstrapProperties>
                         <app.location>${project.artifactId}-${project.version}.war</app.location>
                         <default.http.port>${testServerHttpPort}</default.http.port>
@@ -250,6 +251,21 @@
                     <looseApplication>true</looseApplication>
                 </configuration>
                 <executions>
+                    <execution>
+                        <id>stop-server-before-clean</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>stop-server</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-server</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>install-server</goal>
+                            <goal>create-server</goal>
+                        </goals>
+                    </execution>
                     <execution>
                         <id>install-feature</id>
                         <phase>prepare-package</phase>
@@ -276,6 +292,12 @@
                         <configuration>
                             <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>clean-server</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

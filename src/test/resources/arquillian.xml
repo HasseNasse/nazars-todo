@@ -16,4 +16,8 @@
             <property name="appUndeployTimeout">20</property>
         </configuration>
     </container>
+
+    <extension qualifier="systemproperties">
+        <property name="prefix">ARQT_</property>
+     </extension>
 </arquillian>

@@ -69,7 +69,6 @@ public class TodoActionTest extends EndpointTest{
                         EndpointTest.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
                 .addAsLibraries(files);
-
         System.out.println(warch);
         return warch;
     }
@@ -78,10 +77,10 @@ public class TodoActionTest extends EndpointTest{
     private @Inject @Repository TodoDAO todoDAO;
 
     @BeforeClass public static void setupClass() {
-        jsonb = JsonbBuilder.create();
     }
 
     @Before public void setupTest() {
+        this.jsonb = JsonbBuilder.create();
         //Fill dummy-data
         System.out.println("Filling data for test");
         this.id1 = new ObjectId();
@@ -100,12 +99,13 @@ public class TodoActionTest extends EndpointTest{
 
 
     @Test public void test_getAllTodos_success() {
+
         Response resp = sendRequest(this.url+endpoint, "GET");
+        assertThat(resp.getStatus(), is(equalTo(200)));
         List<Todo> values = jsonb.fromJson(resp.readEntity(String.class)
                 , new ArrayList<Todo>(){}.getClass().getGenericSuperclass());
 
         assertThat(resp, is(notNullValue()));
-        assertThat(resp.getStatus(), is(equalTo(200)));
     }
 
     @Test public void test_getTodoByID_success() {
