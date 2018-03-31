@@ -5,20 +5,27 @@ import qualifiers.Service;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+
+import org.bson.types.ObjectId;
+
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RequestScoped
 @Service
 public class TodoService {
 
     @Inject @Repository private TodoDAO todoDAO;
-    Jsonb jsonb = JsonbBuilder.create();
 
-    public String getAll(){
+    public List<Todo> findAll(){
         List<Todo> todos = todoDAO.findAll();
-        return jsonb.toJson(todos, List.class);
+        return todos;
+    }
+
+    public Todo findById(String id) throws NoSuchElementException{
+        Todo todo = todoDAO.findByID(new ObjectId(id));
+        if(todo == null) throw new NoSuchElementException();
+        else return todoDAO.findByID(new ObjectId(id));
     }
 
     public boolean addTodoToStore(Todo todo){

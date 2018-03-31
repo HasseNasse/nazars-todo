@@ -15,7 +15,6 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.event.Level;
@@ -104,22 +103,21 @@ public class TodoActionTest extends EndpointTest{
         assertThat(resp.getStatus(), is(equalTo(200)));
         List<Todo> values = jsonb.fromJson(resp.readEntity(String.class)
                 , new ArrayList<Todo>(){}.getClass().getGenericSuperclass());
-
+        
         assertThat(resp, is(notNullValue()));
     }
 
     @Test public void test_getTodoByID_success() {
-        int id = 1;
 
-        Response resp = sendRequest(this.url+endpoint + "/" + 1, "GET");
+        Response resp = sendRequest(this.url+endpoint + "/" + this.id1.toHexString(), "GET");
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), is(equalTo(200)));
     }
 
     @Test public void test_getTodoByID_incorrectIDGiven() {
-        String falseID = "bla";
+        ObjectId nonUsedId = new ObjectId();
 
-        Response resp = sendRequest(this.url+endpoint + "/" + falseID, "GET");
+        Response resp = sendRequest(this.url+endpoint + "/" + nonUsedId.toHexString(), "GET");
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), not(equalTo(200)));
     }

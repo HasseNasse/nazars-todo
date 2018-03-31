@@ -35,10 +35,10 @@ public class TodoDAO implements DAO<Todo> {
 
     @Override
     public Todo findByID(ObjectId id) {
-        dbConnection
+       Todo todo =  dbConnection
                 .returnDSConnection()
                 .get(Todo.class, id);
-        return null;
+        return todo;
     }
 
     @Override
