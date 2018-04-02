@@ -4,7 +4,7 @@
 
     <groupId>net.nazarsit</groupId>
     <artifactId>todo</artifactId>
-    <version>1.0.11</version>
+    <version>1.0.12</version>
     <packaging>war</packaging>
 
     <!-- contains default pluginManagement configuration for liberty-maven-plugin -->
@@ -20,6 +20,7 @@
         <testServerHttpsPort>9443</testServerHttpsPort>
         <warContext>${app.name}</warContext>
         <package.file>${project.build.directory}/${project.artifactId}-${project.version}.zip</package.file>
+        <package.fatjar.file>${project.build.directory}/${project.artifactId}-${project.version}.jar</package.fatjar.file>
         <packaging.type>usr</packaging.type>
     </properties>
 
@@ -174,15 +175,6 @@
             <version>2.10.0</version>
         </dependency>
 
-
-        <!--dependency>
-            <groupId>org.jboss.spec</groupId>
-            <artifactId>jboss-javaee-all-7.0</artifactId>
-            <version>1.1.1.Final</version>
-            <scope>provided</scope>
-        </dependency-->
-
-
     </dependencies>
 
     <build>
@@ -219,85 +211,6 @@
                             <threadCount>10</threadCount>
                             -->
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Enable liberty-maven plugin -->
-            <plugin>
-                <groupId>net.wasdev.wlp.maven.plugins</groupId>
-                <artifactId>liberty-maven-plugin</artifactId>
-                <version>2.1.2</version>
-                <configuration>
-                    <assemblyArtifact>
-                        <groupId>com.ibm.websphere.appserver.runtime</groupId>
-                        <artifactId>wlp-webProfile7</artifactId>
-                        <version>17.0.0.4</version>
-                        <type>zip</type>
-                    </assemblyArtifact>
-                    <configFile>${basedir}/src/main/liberty/config/server.xml</configFile>
-                    <serverEnv>${basedir}/src/main/liberty/config/server.env</serverEnv>
-                    <jvmOptionsFile>${basedir}/src/main/liberty/config/jvm.options</jvmOptionsFile>
-                    <packageFile>${package.file}</packageFile>
-                    <include>${packaging.type}</include>
-                    <installAppPackages>project</installAppPackages>
-                    <bootstrapProperties>
-                        <app.location>${project.artifactId}-${project.version}.war</app.location>
-                        <default.http.port>${testServerHttpPort}</default.http.port>
-                        <default.https.port>${testServerHttpsPort}</default.https.port>
-                    </bootstrapProperties>
-                    <features>
-                        <acceptLicense>true</acceptLicense>
-                    </features>
-                    <looseApplication>true</looseApplication>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>stop-server-before-clean</id>
-                        <phase>pre-clean</phase>
-                        <goals>
-                            <goal>stop-server</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>create-server</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>install-server</goal>
-                            <goal>create-server</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>install-feature</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>install-feature</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>install-apps</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>install-apps</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>package-server</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>package-server</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>clean-server</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -357,6 +270,192 @@
                 <package.file>${project.build.directory}/${app.name}.jar</package.file>
                 <packaging.type>runnable</packaging.type>
             </properties>
+        </profile>
+        <profile>
+            <id>dev-build-thinwar</id>
+            <build>
+                <plugins>
+                    <!-- Enable liberty-maven plugin -->
+                    <plugin>
+                        <groupId>net.wasdev.wlp.maven.plugins</groupId>
+                        <artifactId>liberty-maven-plugin</artifactId>
+                        <version>2.1.2</version>
+                        <configuration>
+                            <assemblyArtifact>
+                                <groupId>com.ibm.websphere.appserver.runtime</groupId>
+                                <artifactId>wlp-webProfile7</artifactId>
+                                <version>17.0.0.4</version>
+                                <type>zip</type>
+                            </assemblyArtifact>
+                            <configFile>${basedir}/src/main/liberty/config/server.xml</configFile>
+                            <serverEnv>${basedir}/src/main/liberty/config/server.env</serverEnv>
+                            <jvmOptionsFile>${basedir}/src/main/liberty/config/jvm.options</jvmOptionsFile>
+                            <packageFile>${package.file}</packageFile>
+                            <include>${packaging.type}</include>
+                            <installAppPackages>project</installAppPackages>
+                            <bootstrapProperties>
+                                <app.location>${project.artifactId}-${project.version}.war</app.location>
+                                <default.http.port>${testServerHttpPort}</default.http.port>
+                                <default.https.port>${testServerHttpsPort}</default.https.port>
+                            </bootstrapProperties>
+                            <features>
+                                <acceptLicense>true</acceptLicense>
+                            </features>
+                            <looseApplication>true</looseApplication>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>stop-server-before-clean</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>stop-server</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>create-server</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>install-server</goal>
+                                    <goal>create-server</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>install-feature</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>install-feature</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>install-apps</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>install-apps</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>package-server</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package-server</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>clean-server</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>environment</name>
+                    <value>dev</value>
+                </property>
+            </activation>
+        </profile>
+        <profile>
+            <id>stage-build-fatjar</id>
+            <build>
+                <plugins>
+                    <!-- Enable liberty-maven plugin -->
+                    <plugin>
+                        <groupId>net.wasdev.wlp.maven.plugins</groupId>
+                        <artifactId>liberty-maven-plugin</artifactId>
+                        <version>2.1.2</version>
+                        <configuration>
+                            <assemblyArtifact>
+                                <groupId>com.ibm.websphere.appserver.runtime</groupId>
+                                <artifactId>wlp-webProfile7</artifactId>
+                                <version>17.0.0.4</version>
+                                <type>zip</type>
+                            </assemblyArtifact>
+                            <configFile>${basedir}/src/main/liberty/config/server.xml</configFile>
+                            <serverEnv>${basedir}/src/main/liberty/config/server.env</serverEnv>
+                            <jvmOptionsFile>${basedir}/src/main/liberty/config/jvm.options</jvmOptionsFile>
+                            <packageFile>${package.fatjar.file}</packageFile>
+                            <include>${packaging.type}</include>
+                            <include>runnable</include>
+                            <installAppPackages>project</installAppPackages>
+                            <bootstrapProperties>
+                                <app.location>${project.artifactId}-${project.version}.war</app.location>
+                                <default.http.port>${testServerHttpPort}</default.http.port>
+                                <default.https.port>${testServerHttpsPort}</default.https.port>
+                            </bootstrapProperties>
+                            <features>
+                                <acceptLicense>true</acceptLicense>
+                            </features>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>stop-server-before-clean</id>
+                                <phase>pre-clean</phase>
+                                <goals>
+                                    <goal>stop-server</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>create-server</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>install-server</goal>
+                                    <goal>create-server</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>install-feature</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>install-feature</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>install-apps</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>install-apps</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>package-server</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package-server</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>target/liberty-alt-output-dir</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>clean-server</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>environment</name>
+                    <value>stage</value>
+                </property>
+            </activation>
         </profile>
     </profiles>
 </project>

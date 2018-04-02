@@ -1,6 +1,7 @@
 /target
 /.m2
 /.idea
+/.vscode
 todo.iml
 
 /.classpath
