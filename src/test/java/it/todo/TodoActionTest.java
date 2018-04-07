@@ -13,6 +13,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.asset.UrlAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.*;
@@ -51,8 +52,9 @@ public class TodoActionTest extends EndpointTest{
 
     @Deployment
     public static WebArchive createDeployment() {
-        File[] files = Maven.resolver().loadPomFromFile("pom.xml")
+        File[] pomFiles = Maven.resolver().loadPomFromFile("pom.xml")
                 .importRuntimeDependencies().resolve().withTransitivity().asFile();
+        File configFile = new File("src/main/resources/META-INF/microprofile-config.properties");
 
         WebArchive warch = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(DAO.class,
@@ -67,7 +69,9 @@ public class TodoActionTest extends EndpointTest{
                         Service.class,
                         EndpointTest.class)
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .addAsLibraries(files);
+                .addAsResource(configFile,
+                        "META-INF/microprofile-config.properties")
+                .addAsLibraries(pomFiles);
         System.out.println(warch);
         return warch;
     }

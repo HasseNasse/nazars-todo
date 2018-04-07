@@ -1,0 +1,7 @@
+//TODO
+    1: MP Config                                [X] //extra feature, multiple configs for different envs.
+    2: Configure Logging                        [ ] //LOG4J/SLF4J
+    3: Configure use of CDI Qualifiers          [ ]
+    4: MP Health Checks                         [ ]
+    5: MP Metrics                               [ ]
+    6: MP JWT Authentication                    [ ]
