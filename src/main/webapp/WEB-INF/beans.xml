@@ -3,4 +3,9 @@
        xsi:schemaLocation = "http://xmlns.jcp.org/xml/ns/javaee
         http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd"
        version = "1.1" bean-discovery-mode = "all">
+    <interceptors>
+        <class>application.interceptors.GeneralRepositoryInterceptor</class>
+        <class>application.interceptors.GeneralActionInterceptor</class>
+        <class>application.interceptors.GeneralServiceInterceptor</class>
+    </interceptors>
 </beans>

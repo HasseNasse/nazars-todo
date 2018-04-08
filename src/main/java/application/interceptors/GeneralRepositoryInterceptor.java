@@ -17,7 +17,6 @@ public class GeneralRepositoryInterceptor {
 
     @AroundInvoke
     public Object handleTransaction(InvocationContext ctx) throws Exception{
-
         logger.debug("*Init* DAO function: " + ctx.getMethod() + "...");
         Object value = ctx.proceed();
         logger.debug("-- *Finished* DAO function: " + ctx.getMethod());

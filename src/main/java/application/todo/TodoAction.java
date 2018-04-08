@@ -20,7 +20,6 @@ import org.bson.types.ObjectId;
 @Action
 @Path("/todo")
 public class TodoAction {
-
     @Inject @Service private TodoService todoService;
     Jsonb jsonb = JsonbBuilder.create();
     final Logger logger = LoggerFactory.getLogger(TodoAction.class);
@@ -28,8 +27,6 @@ public class TodoAction {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllTodos(){
-        logger.info("getAllTodos rest endpoint called");
-        logger.debug("getAllTodos rest endpoint called");
         List<Todo> todos = todoService.findAll();
         String todosJson = jsonb.toJson(todos, List.class);
         return Response.ok(todosJson).build();
@@ -40,11 +37,11 @@ public class TodoAction {
     @Produces(MediaType.APPLICATION_JSON)
     public Response findTodoById(@PathParam("id") String id){
         try{
-            todoService.findById(id);
+            Todo resp = todoService.findById(id);
+            return Response.ok(resp).build();
         }catch(NoSuchElementException ex){
             return Response.noContent().build();
         }
-        return Response.ok().build();
     }
 
     @POST
