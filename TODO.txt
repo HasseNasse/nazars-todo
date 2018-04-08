@@ -1,7 +1,12 @@
 //TODO
     1: MP Config                                [X] //extra feature, multiple configs for different envs.
-    2: Configure Logging                        [ ] //LOG4J/SLF4J
-    3: Configure use of CDI Qualifiers          [ ]
+    2: Configure Logging                        [X] //SLF4J w. LOG4J configured, fout to logs/todo.log
+    3: Configure use of CDI Interceptors        [ ]
     4: MP Health Checks                         [ ]
     5: MP Metrics                               [ ]
     6: MP JWT Authentication                    [ ]
+
+
+//SLF4J
+- The Simple Logging Facade for Java (SLF4J) serves as a simple facade or abstraction for various logging frameworks
+                (e.g. java.util.logging, logback, log4j) allowing the end user to plug in the desired logging framework at deployment time.
