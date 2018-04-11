@@ -145,6 +145,8 @@ public class TodoActionTest extends EndpointTest{
         updatableTodo.setTodo("My newly changed Todo");
         resp = sendPutRequest(this.url+endpoint,jsonb.toJson(updatableTodo));
         assertThat(resp.getStatus(), is(equalTo(200)));
+
+        DBcon.returnDSConnection().delete(Todo.class, updatableTodoId);
     }
 
 
