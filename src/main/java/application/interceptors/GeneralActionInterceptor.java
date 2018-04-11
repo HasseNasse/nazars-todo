@@ -16,9 +16,9 @@ public class GeneralActionInterceptor {
 
     @AroundInvoke
     public Object handleTransaction(InvocationContext ctx) throws Exception{
-        logger.debug("*Init* Action: " + ctx.getMethod() + "...");
+        logger.debug("*Init* \tAction:\t\t" + ctx.getMethod().getName());
         Object value = ctx.proceed();
-        logger.debug("-- *Finished* Action: " + ctx.getMethod());
+        logger.debug("-- *Finished* \tAction:\t\t" + ctx.getMethod().getName());
         return value;
     }
 }

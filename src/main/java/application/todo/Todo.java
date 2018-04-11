@@ -8,14 +8,14 @@ import java.util.Date;
 
 @Entity(value="todos", noClassnameStored = true)
 public class Todo {
-    @Id private ObjectId id;
+    @Id private String uuid;
     private String todo;
     private boolean finished;
     private Date created;
     private Date deadline;
 
-    public Todo(ObjectId id, String todo, boolean finished, Date created, Date deadline) {
-        this.id = id;
+    public Todo(ObjectId id, String uuid, String todo, boolean finished, Date created, Date deadline) {
+        this.uuid = uuid;
         this.todo = todo;
         this.finished = finished;
         this.created = created;
@@ -25,12 +25,12 @@ public class Todo {
     public Todo() {
     }
 
-    public ObjectId getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getTodo() {

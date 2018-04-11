@@ -23,13 +23,17 @@ public class TodoService {
     }
 
     public Todo findById(String id) throws NoSuchElementException{
-        Todo todo = todoDAO.findByID(new ObjectId(id));
+        Todo todo = todoDAO.findByID(id);
         if(todo == null) throw new NoSuchElementException();
-        else return todoDAO.findByID(new ObjectId(id));
+        else return todo;
     }
 
     public boolean addTodoToStore(Todo todo){
         return todoDAO.insert(todo);
+    }
+
+    public boolean updateTodo(Todo todo){
+        return todoDAO.update(todo);
     }
 
     public boolean deleteTodo(Todo todo) {

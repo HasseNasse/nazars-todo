@@ -16,9 +16,9 @@ public class GeneralServiceInterceptor {
 
     @AroundInvoke
     public Object handleTransaction(InvocationContext ctx) throws Exception{
-        logger.debug("*Init* Service: " + ctx.getMethod() + "...");
+        logger.debug("*Init* \tService:\t" + ctx.getMethod().getName());
         Object value = ctx.proceed();
-        logger.debug("-- *Finished* Service: " + ctx.getMethod());
+        logger.debug("-- *Finished* \tService:\t" + ctx.getMethod().getName());
         return value;
     }
 }

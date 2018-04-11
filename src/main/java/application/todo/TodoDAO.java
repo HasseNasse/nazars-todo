@@ -2,8 +2,6 @@ package application.todo;
 
 import application.datastore.DAO;
 import application.datastore.DataSourceConnection;
-import com.mongodb.operation.UpdateOperation;
-import org.bson.types.ObjectId;
 import qualifiers.Repository;
 
 
@@ -14,6 +12,7 @@ import javax.json.bind.JsonbBuilder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 @Repository
@@ -34,8 +33,8 @@ public class TodoDAO implements DAO<Todo> {
     }
 
     @Override
-    public Todo findByID(ObjectId id) {
-       Todo todo =  dbConnection
+    public Todo findByID(String id) {
+       Todo todo = dbConnection
                 .returnDSConnection()
                 .get(Todo.class, id);
         return todo;
@@ -43,8 +42,11 @@ public class TodoDAO implements DAO<Todo> {
 
     @Override
     public boolean insert(Todo obj) {
-        ObjectId id = new ObjectId();
-        obj.setId(id);
+        String id = UUID.randomUUID().toString();
+        if(obj.getUuid() != null)
+            id = obj.getUuid();
+        else obj.setUuid(id);
+
         dbConnection
                 .returnDSConnection()
                 .save(obj);
@@ -56,24 +58,24 @@ public class TodoDAO implements DAO<Todo> {
 
     @Override
     public boolean update(Todo obj) {
-        //// TODO: 2018-02-23 FINISH UPDATE STATEMENT
         Todo todo = dbConnection
                         .returnDSConnection()
-                        .get(Todo.class, obj.getId());
+                        .get(Todo.class, obj.getUuid());
 
         todo.setTodo(obj.getTodo());
         todo.setDeadline(obj.getDeadline());
         todo.setFinished(obj.isFinished());
-        return false;
+        dbConnection.returnDSConnection().delete(Todo.class, todo.getUuid());
+        return dbConnection.returnDSConnection().save(todo) != null;
     }
 
     @Override
     public boolean delete(Todo obj) {
-        return deleteByID(obj.getId());
+        return deleteByID(obj.getUuid());
     }
 
     @Override
-    public boolean deleteByID(ObjectId id) {
+    public boolean deleteByID(String id) {
         return dbConnection
                 .returnDSConnection()
                 .delete(Todo.class, id)

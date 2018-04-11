@@ -7,6 +7,7 @@ import application.todo.Todo;
 import application.todo.TodoAction;
 import application.todo.TodoDAO;
 import application.todo.TodoService;
+import com.mongodb.DB;
 import it.EndpointTest;
 import org.bson.types.ObjectId;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -46,7 +48,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 @RunWith(Arquillian.class)
 public class TodoActionTest extends EndpointTest{
 
-    ObjectId id1, id2, id3;
+    String uuid1, uuid2, uuid3;
     private final String endpoint = "/rest/todo";
     private static Jsonb jsonb;
 
@@ -72,7 +74,6 @@ public class TodoActionTest extends EndpointTest{
                 .addAsResource(configFile,
                         "META-INF/microprofile-config.properties")
                 .addAsLibraries(pomFiles);
-        System.out.println(warch);
         return warch;
     }
 
@@ -86,14 +87,14 @@ public class TodoActionTest extends EndpointTest{
         this.jsonb = JsonbBuilder.create();
         //Fill dummy-data
         System.out.println("Filling data for test");
-        this.id1 = new ObjectId();
-        this.id2 = new ObjectId();
-        this.id3 = new ObjectId();
+        this.uuid1 = UUID.randomUUID().toString();
+        this.uuid2 = UUID.randomUUID().toString();
+        this.uuid3 = UUID.randomUUID().toString();
 
 
-        Todo dummytodo1 = new Todo(this.id1, "Gotta do 1 stuff", false, new Date(), new Date());
-        Todo dummytodo2 = new Todo(this.id2, "Gotta do 2 stuff", false, new Date(), new Date());
-        Todo dummytodo3 = new Todo(this.id3, "Gotta do 3 stuff", false, new Date(), new Date());
+        Todo dummytodo1 = new Todo(new ObjectId(), this.uuid1, "Gotta do 1 stuff", false, new Date(), new Date());
+        Todo dummytodo2 = new Todo(new ObjectId(), this.uuid2, "Gotta do 2 stuff", false, new Date(), new Date());
+        Todo dummytodo3 = new Todo(new ObjectId(), this.uuid3, "Gotta do 3 stuff", false, new Date(), new Date());
 
         DBcon.returnDSConnection().save(dummytodo1);
         DBcon.returnDSConnection().save(dummytodo2);
@@ -113,23 +114,45 @@ public class TodoActionTest extends EndpointTest{
 
     @Test public void test_getTodoByID_success() {
 
-        Response resp = sendRequest(this.url+endpoint + "/" + this.id1.toHexString(), "GET");
+        Response resp = sendRequest(this.url+endpoint + "/" + this.uuid1, "GET");
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), is(equalTo(200)));
     }
 
     @Test public void test_getTodoByID_incorrectIDGiven() {
-        ObjectId nonUsedId = new ObjectId();
+        String nonUsedId = UUID.randomUUID().toString();
 
-        Response resp = sendRequest(this.url+endpoint + "/" + nonUsedId.toHexString(), "GET");
+        Response resp = sendRequest(this.url+endpoint + "/" + nonUsedId, "GET");
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), not(equalTo(200)));
     }
 
+    @Test public void test_updateTodo_success() {
+        String updatableTodoId = UUID.randomUUID().toString();
+        Todo updatableTodo = new Todo(
+                new ObjectId(),
+                updatableTodoId,
+                "my update todo",
+                false,
+                new Date(),
+                new Date()
+        );
+
+        DBcon.returnDSConnection().save(updatableTodo);
+        Response resp = sendRequest(this.url+endpoint + "/" + updatableTodoId, "GET");
+        assertThat(resp.getStatus(), is(equalTo(200)));
+
+        updatableTodo.setTodo("My newly changed Todo");
+        resp = sendPutRequest(this.url+endpoint,jsonb.toJson(updatableTodo));
+        assertThat(resp.getStatus(), is(equalTo(200)));
+    }
+
 
     @Test public void test_createTodo_success() {
+        String newTodoId = UUID.randomUUID().toString();
         Todo newTodo = new Todo();
-        newTodo.setTodo("Eat food");
+        newTodo.setUuid(newTodoId);
+        newTodo.setTodo("customtodo");
         newTodo.setCreated(new Date());
         newTodo.setDeadline(null);
 
@@ -137,6 +160,8 @@ public class TodoActionTest extends EndpointTest{
         Response resp = sendPostRequest(this.url+endpoint, jsonb.toJson(newTodo));
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), is(equalTo(200)));
+
+        DBcon.returnDSConnection().delete(Todo.class, newTodoId);
     }
 
 
@@ -144,12 +169,12 @@ public class TodoActionTest extends EndpointTest{
 
     @After public void tearDownTest() {
         System.out.println("Cleaning up after test");
-        if(DBcon.returnDSConnection().delete(Todo.class, id1).wasAcknowledged())
-            System.out.println(id1 + "Object deleted");
-        if(DBcon.returnDSConnection().delete(Todo.class, id2).wasAcknowledged())
-            System.out.println(id2 + "Object deleted");
-        if(DBcon.returnDSConnection().delete(Todo.class, id3).wasAcknowledged())
-            System.out.println(id3 + "Object deleted");
+        if(DBcon.returnDSConnection().delete(Todo.class, uuid1).wasAcknowledged())
+            System.out.println(uuid1 + "Object deleted");
+        if(DBcon.returnDSConnection().delete(Todo.class, uuid2).wasAcknowledged())
+            System.out.println(uuid2 + "Object deleted");
+        if(DBcon.returnDSConnection().delete(Todo.class, uuid3).wasAcknowledged())
+            System.out.println(uuid3 + "Object deleted");
     }
 
     @AfterClass public static void tearDownClass(){

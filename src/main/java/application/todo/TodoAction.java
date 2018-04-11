@@ -44,6 +44,12 @@ public class TodoAction {
         }
     }
 
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateTodo(final Todo todo){
+        return todoService.updateTodo(todo) ? Response.ok().build() : Response.status(403).build();
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTodo(final Todo todo){

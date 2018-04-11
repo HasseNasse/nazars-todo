@@ -45,4 +45,12 @@ public class EndpointTest {
         Response response = invoBuild.post(Entity.entity(jsonData, MediaType.APPLICATION_JSON));
         return response;
     }
+
+    public Response sendPutRequest(String url, String jsonData){
+        System.out.println("Testing " + url);
+        WebTarget target = this.client.target(url);
+        Invocation.Builder invoBuild = target.request(MediaType.APPLICATION_JSON);
+        Response response = invoBuild.put(Entity.entity(jsonData, MediaType.APPLICATION_JSON));
+        return response;
+    }
 }

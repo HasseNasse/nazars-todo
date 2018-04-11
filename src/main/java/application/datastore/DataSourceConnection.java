@@ -1,6 +1,7 @@
 package application.datastore;
 
 import application.todo.Todo;
+import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
