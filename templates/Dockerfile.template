@@ -1,0 +1,8 @@
+FROM fabric8/java-jboss-openjdk8-jdk
+
+ENV JAVA_APP_JAR ./todo-{{projectVersion}}.jar
+ENV AB_OFF true
+
+EXPOSE 9080
+
+ADD ./target/todo-{{projectVersion}}.jar /deployments/
