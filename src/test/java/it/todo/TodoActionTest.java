@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import static org.eclipse.microprofile.jwt.tck.util.TokenUtils.*;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -58,6 +59,8 @@ public class TodoActionTest extends EndpointTest{
         File[] pomFiles = Maven.resolver().loadPomFromFile("pom.xml")
                 .importRuntimeDependencies().resolve().withTransitivity().asFile();
         File configFile = new File("src/main/resources/META-INF/microprofile-config.properties");
+        File jwtToken = new File( "src/test/resources/jwt-token.json" );
+        File privateKey = new File( "src/test/resources/privateKey.pem" );
 
         WebArchive warch = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(DAO.class,
@@ -71,10 +74,11 @@ public class TodoActionTest extends EndpointTest{
                         Repository.class,
                         Service.class,
                         EndpointTest.class)
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-                .addAsResource(configFile,
-                        "META-INF/microprofile-config.properties")
-                .addAsLibraries(pomFiles);
+                .addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
+                .addAsResource( configFile, "META-INF/microprofile-config.properties" )
+                .addAsResource( jwtToken, "jwt-token.json" )
+                .addAsResource( privateKey, "privateKey.pem" )
+                .addAsLibraries( pomFiles );
         return warch;
     }
 
@@ -105,10 +109,10 @@ public class TodoActionTest extends EndpointTest{
     }
 
 
-    @Test public void test_getAllTodos_success() {
-
-        Response resp = sendRequest(this.url+endpoint, "GET", null);
-        assertThat(resp.getStatus(), is(equalTo(200)));
+    @Test public void test_getAllTodos_success() throws Exception{
+        String token =  generateTokenString("/jwt-token.json");
+        Response resp = sendRequest(this.url+endpoint, "GET", token);
+        assertThat( resp.getStatus(), is( equalTo(200 )));
         List<Todo> values = jsonb.fromJson(resp.readEntity(String.class)
                 , new ArrayList<Todo>(){}.getClass().getGenericSuperclass());
         

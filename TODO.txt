@@ -2,7 +2,7 @@
     1: MP Config                                [X] //extra feature, multiple configs for different envs.
     2: Configure Logging                        [X] //SLF4J w. LOG4J configured, fout to logs/todo.log
     3: Configure use of CDI Interceptors        [X]
-    4: MP JWT Authentication                    [ ]
+    4: MP JWT Authentication                    [ ] //TODO nullpointer at generateStringToken("/jwt-token.json")
     5: MP Health Checks                         [ ]
     6: MP Metrics                               [ ]
 

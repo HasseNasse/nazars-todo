@@ -35,4 +35,4 @@
     <applicationMonitor dropinsEnabled="true" updateTrigger="mbean" />
 
     <webApplication name="todo" location="${app.location}"/>
-</server>2
+</server>
