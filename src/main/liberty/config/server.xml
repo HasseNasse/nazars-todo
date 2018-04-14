@@ -2,10 +2,19 @@
 
     <featureManager>
       <feature>microprofile-1.2</feature>
-      <!--<feature>apiDiscovery-1.0</feature>-->
       <feature>jndi-1.0</feature>
       <feature>localConnector-1.0</feature>
     </featureManager>
+
+    <!--MP JWT Configuration
+        audience: The party reading the data in this JWT must find itself in the aud claim or
+                    disregard the data contained in the JWT.
+    -->
+    <mpJwt
+            id="todoAPI-JWT-v1"
+            issuer="nazars.todo.api/v1"
+            audiences="todoApiConsumer">
+    </mpJwt>
 
     <httpEndpoint httpPort="${default.http.port}" httpsPort="${default.https.port}"
       id="defaultHttpEndpoint" host="*" />
@@ -26,4 +35,4 @@
     <applicationMonitor dropinsEnabled="true" updateTrigger="mbean" />
 
     <webApplication name="todo" location="${app.location}"/>
-</server>
+</server>2

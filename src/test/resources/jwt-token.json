@@ -1,0 +1,15 @@
+
+{
+  "iss": "nazars.todo.api/v1",
+  "jti": "a-123",
+  "sub": "24400320",
+  "aud": "todoApiConsumer",
+  "exp": 1311281970,
+  "iat": 1311280970,
+  "auth_time": 1311280969,
+  "upn": "test",
+  "groups": [
+    "admin",
+    "user"
+  ]
+}

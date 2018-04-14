@@ -4,7 +4,7 @@
 
     <groupId>net.nazarsit</groupId>
     <artifactId>todo</artifactId>
-    <version>1.0.19</version>
+    <version>1.0.20</version>
     <packaging>war</packaging>
 
     <!-- contains default pluginManagement configuration for liberty-maven-plugin -->
@@ -67,6 +67,32 @@
             <version>1.0.0.CR1</version>
             <scope>test</scope>
         </dependency>
+        <!-- This is the actual MP-JWT TCK test classes -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.jwt</groupId>
+            <artifactId>microprofile-jwt-auth-tck</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.testng</groupId>
+                    <artifactId>testng</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.shrinkwrap</groupId>
+                    <artifactId>shrinkwrap-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.arquillian.testng</groupId>
+                    <artifactId>arquillian-testng-container</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.shrinkwrap.resolver</groupId>
+                    <artifactId>shrinkwrap-resolver-depchain</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 
         <!-- Mockito -->
         <dependency>
@@ -118,6 +144,7 @@
             <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
             <scope>test</scope>
         </dependency>
+
 
 
         <!--        // DEPENDENCIES //          -->

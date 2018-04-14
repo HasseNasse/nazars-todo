@@ -44,12 +44,13 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.IsInstanceOf.any;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 
 @RunWith(Arquillian.class)
 public class TodoActionTest extends EndpointTest{
 
     String uuid1, uuid2, uuid3;
-    private final String endpoint = "/rest/todo";
+    private final String endpoint = "/todos";
     private static Jsonb jsonb;
 
     @Deployment
@@ -99,12 +100,14 @@ public class TodoActionTest extends EndpointTest{
         DBcon.returnDSConnection().save(dummytodo1);
         DBcon.returnDSConnection().save(dummytodo2);
         DBcon.returnDSConnection().save(dummytodo3);
+
+
     }
 
 
     @Test public void test_getAllTodos_success() {
 
-        Response resp = sendRequest(this.url+endpoint, "GET");
+        Response resp = sendRequest(this.url+endpoint, "GET", null);
         assertThat(resp.getStatus(), is(equalTo(200)));
         List<Todo> values = jsonb.fromJson(resp.readEntity(String.class)
                 , new ArrayList<Todo>(){}.getClass().getGenericSuperclass());
@@ -114,7 +117,7 @@ public class TodoActionTest extends EndpointTest{
 
     @Test public void test_getTodoByID_success() {
 
-        Response resp = sendRequest(this.url+endpoint + "/" + this.uuid1, "GET");
+        Response resp = sendRequest(this.url+endpoint + "/" + this.uuid1, "GET", null);
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), is(equalTo(200)));
     }
@@ -122,7 +125,7 @@ public class TodoActionTest extends EndpointTest{
     @Test public void test_getTodoByID_incorrectIDGiven() {
         String nonUsedId = UUID.randomUUID().toString();
 
-        Response resp = sendRequest(this.url+endpoint + "/" + nonUsedId, "GET");
+        Response resp = sendRequest(this.url+endpoint + "/" + nonUsedId, "GET", null);
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), not(equalTo(200)));
     }
@@ -139,11 +142,11 @@ public class TodoActionTest extends EndpointTest{
         );
 
         DBcon.returnDSConnection().save(updatableTodo);
-        Response resp = sendRequest(this.url+endpoint + "/" + updatableTodoId, "GET");
+        Response resp = sendRequest(this.url+endpoint + "/" + updatableTodoId, "GET", null);
         assertThat(resp.getStatus(), is(equalTo(200)));
 
         updatableTodo.setTodo("My newly changed Todo");
-        resp = sendPutRequest(this.url+endpoint,jsonb.toJson(updatableTodo));
+        resp = sendPutRequest(this.url+endpoint,jsonb.toJson(updatableTodo), null);
         assertThat(resp.getStatus(), is(equalTo(200)));
 
         DBcon.returnDSConnection().delete(Todo.class, updatableTodoId);
@@ -159,7 +162,7 @@ public class TodoActionTest extends EndpointTest{
         newTodo.setDeadline(null);
 
 
-        Response resp = sendPostRequest(this.url+endpoint, jsonb.toJson(newTodo));
+        Response resp = sendPostRequest(this.url+endpoint, jsonb.toJson(newTodo), null);
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), is(equalTo(200)));
 

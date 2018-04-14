@@ -8,6 +8,7 @@ import qualifiers.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -18,7 +19,7 @@ import javax.json.bind.JsonbBuilder;
 import org.bson.types.ObjectId;
 
 @Action
-@Path("/todo")
+@Path("/")
 public class TodoAction {
     @Inject @Service private TodoService todoService;
     Jsonb jsonb = JsonbBuilder.create();
@@ -26,6 +27,7 @@ public class TodoAction {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed({"admin"})
     public Response getAllTodos(){
         List<Todo> todos = todoService.findAll();
         String todosJson = jsonb.toJson(todos, List.class);
