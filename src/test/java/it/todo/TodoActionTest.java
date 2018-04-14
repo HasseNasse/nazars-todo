@@ -45,7 +45,6 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.core.IsInstanceOf.any;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import org.eclipse.microprofile.jwt.tck.util.TokenUtils;
 
 @RunWith(Arquillian.class)
 public class TodoActionTest extends EndpointTest{
@@ -60,7 +59,7 @@ public class TodoActionTest extends EndpointTest{
                 .importRuntimeDependencies().resolve().withTransitivity().asFile();
         File configFile = new File("src/main/resources/META-INF/microprofile-config.properties");
         File jwtToken = new File( "src/test/resources/jwt-token.json" );
-        File privateKey = new File( "src/test/resources/privateKey.pem" );
+        File privateKey = new File( "resources/privateKey-pcks8.pem" );
 
         WebArchive warch = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(DAO.class,
@@ -115,7 +114,7 @@ public class TodoActionTest extends EndpointTest{
         assertThat( resp.getStatus(), is( equalTo(200 )));
         List<Todo> values = jsonb.fromJson(resp.readEntity(String.class)
                 , new ArrayList<Todo>(){}.getClass().getGenericSuperclass());
-        
+
         assertThat(resp, is(notNullValue()));
     }
 
