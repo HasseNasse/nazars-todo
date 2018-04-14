@@ -1,1 +1,2 @@
 *Key.pem filter=git-crypt diff=git-crypt
+*Key-pcks8.pem filter=git-crypt diff=git-crypt
