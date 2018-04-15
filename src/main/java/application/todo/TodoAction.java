@@ -25,7 +25,7 @@ public class TodoAction {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-//    @RolesAllowed({"admin"})
+    @RolesAllowed({"admin"})
     public Response getAllTodos(){
         List<Todo> todos = todoService.findAll();
         String todosJson = jsonb.toJson(todos, List.class);

@@ -16,3 +16,5 @@ todo.iml
 
 src/main/liberty/config/server.env
 src/main/resources/localdev-config.json
+src/test/resources/token.txt
+src/test/resources/keystore*

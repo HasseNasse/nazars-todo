@@ -10,6 +10,7 @@ import application.todo.TodoService;
 import com.mongodb.DB;
 import it.EndpointTest;
 import it.JwtVerifier;
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.common.i18n.Exception;
 import org.apache.cxf.common.util.Base64Exception;
 import org.bson.types.ObjectId;
@@ -35,6 +36,8 @@ import javax.xml.bind.ValidationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -61,10 +64,26 @@ public class TodoActionTest extends EndpointTest{
 
     @Deployment
     public static WebArchive createDeployment() {
+        //Create a JWT Token and push it to a token file
+        try (PrintWriter out = new PrintWriter("src/test/resources/token.txt")) {
+            Set<String> groups = new HashSet<>( );
+            groups.add( "admin" );
+            groups.add( "user" );
+
+            JwtVerifier jwtVerifier = new JwtVerifier();
+            String token = jwtVerifier.createJwt( "MYUSER", groups );
+            System.out.println("TOKEN " + token);
+
+            out.println(token);
+        }catch ( java.lang.Exception e ) {
+            e.printStackTrace();
+        }
+
         File[] pomFiles = Maven.resolver().loadPomFromFile("pom.xml")
                 .importRuntimeDependencies().resolve().withTransitivity().asFile();
         File configFile = new File("src/main/resources/META-INF/microprofile-config.properties");
         File keyStore = new File ("src/test/resources/keystore.jceks");
+        File token = new File ("src/test/resources/token.txt");
 
         WebArchive warch = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(DAO.class,
@@ -82,6 +101,7 @@ public class TodoActionTest extends EndpointTest{
                 .addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
                 .addAsResource( configFile, "META-INF/microprofile-config.properties" )
                 .addAsResource( keyStore, "keystore.jceks" )
+                .addAsResource( token, "token.txt" )
                 .addAsLibraries( pomFiles );
         return warch;
     }
@@ -89,19 +109,7 @@ public class TodoActionTest extends EndpointTest{
     private @Inject DataSourceConnection DBcon;
     private @Inject @Repository TodoDAO todoDAO;
 
-    @BeforeClass public static void setupClass() {
-
-        Set<String> groups = new HashSet<>( );
-        groups.add( "admin" );
-        groups.add( "user" );
-        try{
-            JwtVerifier jwtVerifier = new JwtVerifier();
-            String token = jwtVerifier.createJwt( "MYUSER", groups );
-            System.out.println("TOKEN " + token);
-        }catch ( java.lang.Exception e ){
-            e.printStackTrace();
-        }
-    }
+    @BeforeClass public static void setupClass() { }
 
     @Before public void setupTest() {
         this.jsonb = JsonbBuilder.create();
@@ -119,12 +127,19 @@ public class TodoActionTest extends EndpointTest{
         DBcon.returnDSConnection().save(dummytodo1);
         DBcon.returnDSConnection().save(dummytodo2);
         DBcon.returnDSConnection().save(dummytodo3);
+
+        //Read in the created token for integration testing
+        ClassLoader classLoader = getClass().getClassLoader();
+        try {
+            this.token = IOUtils.toString( classLoader.getResourceAsStream( "/token.txt" ), Charset.defaultCharset() ).trim();
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
     }
 
 
     @Test public void test_getAllTodos_success(){
-        System.out.println("TOKEN " + token);
-        Response resp = sendRequest(this.url + endpoint, "GET", null);
+        Response resp = sendRequest(this.url + endpoint, "GET", this.token);
         assertThat( resp.getStatus(), is( equalTo(200 )));
         List<Todo> values = jsonb.fromJson(resp.readEntity(String.class)
                 , new ArrayList<Todo>(){}.getClass().getGenericSuperclass());
