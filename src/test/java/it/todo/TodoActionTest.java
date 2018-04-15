@@ -55,13 +55,16 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 public class TodoActionTest extends EndpointTest{
 
     String uuid1, uuid2, uuid3;
+    String token;
     private final String endpoint = "/todos";
     private static Jsonb jsonb;
+
     @Deployment
     public static WebArchive createDeployment() {
         File[] pomFiles = Maven.resolver().loadPomFromFile("pom.xml")
                 .importRuntimeDependencies().resolve().withTransitivity().asFile();
         File configFile = new File("src/main/resources/META-INF/microprofile-config.properties");
+        File keyStore = new File ("src/test/resources/keystore.jceks");
 
         WebArchive warch = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(DAO.class,
@@ -78,6 +81,7 @@ public class TodoActionTest extends EndpointTest{
                         JwtVerifier.class)
                 .addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
                 .addAsResource( configFile, "META-INF/microprofile-config.properties" )
+                .addAsResource( keyStore, "keystore.jceks" )
                 .addAsLibraries( pomFiles );
         return warch;
     }
@@ -86,13 +90,16 @@ public class TodoActionTest extends EndpointTest{
     private @Inject @Repository TodoDAO todoDAO;
 
     @BeforeClass public static void setupClass() {
-        Set<String> groupSet = new HashSet( );
-        groupSet.add( "admin" );
-        groupSet.add( "user" );
+
+        Set<String> groups = new HashSet<>( );
+        groups.add( "admin" );
+        groups.add( "user" );
         try{
-            String token = new JwtVerifier().createJwt( "dummyUser", groupSet );
-        }catch ( java.lang.Exception ex ){
-            ex.printStackTrace();
+            JwtVerifier jwtVerifier = new JwtVerifier();
+            String token = jwtVerifier.createJwt( "MYUSER", groups );
+            System.out.println("TOKEN " + token);
+        }catch ( java.lang.Exception e ){
+            e.printStackTrace();
         }
     }
 
@@ -112,12 +119,11 @@ public class TodoActionTest extends EndpointTest{
         DBcon.returnDSConnection().save(dummytodo1);
         DBcon.returnDSConnection().save(dummytodo2);
         DBcon.returnDSConnection().save(dummytodo3);
-
     }
 
 
     @Test public void test_getAllTodos_success(){
-
+        System.out.println("TOKEN " + token);
         Response resp = sendRequest(this.url + endpoint, "GET", null);
         assertThat( resp.getStatus(), is( equalTo(200 )));
         List<Todo> values = jsonb.fromJson(resp.readEntity(String.class)

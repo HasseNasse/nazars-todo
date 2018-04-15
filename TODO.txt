@@ -19,3 +19,4 @@
     keystore on the keyStoreRef attribute, the private key from the specified keystore is used. If the keyAlias 
     attribute is not configured and the keystore contains only one private key, that private key is used in the signature.
 - Java Cryptography Extensions Keystore (JCEKS) (as defined in server.xml)
+- KEY-STORE: A key ring which stores the public and private keys of the JVM.
