@@ -9,6 +9,9 @@ import application.todo.TodoDAO;
 import application.todo.TodoService;
 import com.mongodb.DB;
 import it.EndpointTest;
+import it.JwtVerifier;
+import org.apache.cxf.common.i18n.Exception;
+import org.apache.cxf.common.util.Base64Exception;
 import org.bson.types.ObjectId;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -28,15 +31,17 @@ import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.ValidationException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
 import java.util.logging.Logger;
 
-import static org.eclipse.microprofile.jwt.tck.util.TokenUtils.*;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -52,14 +57,11 @@ public class TodoActionTest extends EndpointTest{
     String uuid1, uuid2, uuid3;
     private final String endpoint = "/todos";
     private static Jsonb jsonb;
-
     @Deployment
     public static WebArchive createDeployment() {
         File[] pomFiles = Maven.resolver().loadPomFromFile("pom.xml")
                 .importRuntimeDependencies().resolve().withTransitivity().asFile();
         File configFile = new File("src/main/resources/META-INF/microprofile-config.properties");
-        File jwtToken = new File( "src/test/resources/jwt-token.json" );
-        File privateKey = new File( "resources/privateKey-pcks8.pem" );
 
         WebArchive warch = ShrinkWrap.create(WebArchive.class, "test.war")
                 .addClasses(DAO.class,
@@ -72,11 +74,10 @@ public class TodoActionTest extends EndpointTest{
                         Action.class,
                         Repository.class,
                         Service.class,
-                        EndpointTest.class)
+                        EndpointTest.class,
+                        JwtVerifier.class)
                 .addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
                 .addAsResource( configFile, "META-INF/microprofile-config.properties" )
-                .addAsResource( jwtToken, "jwt-token.json" )
-                .addAsResource( privateKey, "privateKey.pem" )
                 .addAsLibraries( pomFiles );
         return warch;
     }
@@ -85,6 +86,14 @@ public class TodoActionTest extends EndpointTest{
     private @Inject @Repository TodoDAO todoDAO;
 
     @BeforeClass public static void setupClass() {
+        Set<String> groupSet = new HashSet( );
+        groupSet.add( "admin" );
+        groupSet.add( "user" );
+        try{
+            String token = new JwtVerifier().createJwt( "dummyUser", groupSet );
+        }catch ( java.lang.Exception ex ){
+            ex.printStackTrace();
+        }
     }
 
     @Before public void setupTest() {
@@ -104,13 +113,12 @@ public class TodoActionTest extends EndpointTest{
         DBcon.returnDSConnection().save(dummytodo2);
         DBcon.returnDSConnection().save(dummytodo3);
 
-
     }
 
 
-    @Test public void test_getAllTodos_success() throws Exception{
-        String token =  generateTokenString("/jwt-token.json");
-        Response resp = sendRequest(this.url+endpoint, "GET", token);
+    @Test public void test_getAllTodos_success(){
+
+        Response resp = sendRequest(this.url + endpoint, "GET", null);
         assertThat( resp.getStatus(), is( equalTo(200 )));
         List<Todo> values = jsonb.fromJson(resp.readEntity(String.class)
                 , new ArrayList<Todo>(){}.getClass().getGenericSuperclass());
@@ -119,7 +127,6 @@ public class TodoActionTest extends EndpointTest{
     }
 
     @Test public void test_getTodoByID_success() {
-
         Response resp = sendRequest(this.url+endpoint + "/" + this.uuid1, "GET", null);
         assertThat(resp, is(notNullValue()));
         assertThat(resp.getStatus(), is(equalTo(200)));

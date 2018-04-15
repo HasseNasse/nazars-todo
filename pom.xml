@@ -4,7 +4,7 @@
 
     <groupId>net.nazarsit</groupId>
     <artifactId>todo</artifactId>
-    <version>1.0.26</version>
+    <version>1.0.27</version>
     <packaging>war</packaging>
 
     <!-- contains default pluginManagement configuration for liberty-maven-plugin -->
@@ -14,14 +14,17 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <app.dns>localhost</app.dns>
+        <app.hostname>localhost</app.hostname>
         <app.name>todo</app.name>
-        <testServerHttpPort>9080</testServerHttpPort>
-        <testServerHttpsPort>9443</testServerHttpsPort>
+        <HttpPort>9080</HttpPort>
+        <HttpsPort>9443</HttpsPort>
         <warContext>${app.name}</warContext>
         <package.file>${project.build.directory}/${project.artifactId}-${project.version}.zip</package.file>
         <package.fatjar.file>${project.build.directory}/${project.artifactId}-${project.version}.jar</package.fatjar.file>
         <packaging.type>usr</packaging.type>
+        <jwtIssuerName>nazars.todo.api/v1</jwtIssuerName>
+        <jwt.issuer>${jwtIssuerName}</jwt.issuer>
+
     </properties>
 
     <repositories>
@@ -145,8 +148,6 @@
             <scope>test</scope>
         </dependency>
 
-
-
         <!--        // DEPENDENCIES //          -->
         <!-- JSON-B -->
         <dependency>
@@ -165,7 +166,7 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>3.4.0</version>
-            <scope>compile </scope>
+            <scope>compile</scope>
         </dependency>
         <!-- MongoDB Morphia Object Document Mapper -->
         <dependency>
@@ -177,7 +178,6 @@
             <groupId>org.eclipse.microprofile</groupId>
             <artifactId>microprofile</artifactId>
             <version>1.2</version>
-            <scope>provided</scope>
             <type>pom</type>
         </dependency>
         <dependency>
@@ -275,7 +275,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>2.21.0</version>
                 <executions>
                     <execution>
                         <phase>integration-test</phase>
@@ -291,9 +291,11 @@
                                 <exclude>**/unit/**</exclude>
                             </excludes>
                             <systemPropertyVariables>
-                                <liberty.test.port>${testServerHttpPort}</liberty.test.port>
+                                <liberty.backend.service.ssl.port>${HttpsPort}</liberty.backend.service.ssl.port>
+                                <liberty.backend.service.port>${HttpPort}</liberty.backend.service.port>
+                                <jwt.issuer>${jwt.issuer}</jwt.issuer>
                                 <war.context>${warContext}</war.context>
-                                <app.dns>${app.dns}</app.dns>
+                                <app.hostname>${app.hostname}</app.hostname>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
@@ -344,8 +346,9 @@
                             <installAppPackages>all</installAppPackages>
                             <bootstrapProperties>
                                 <app.location>${project.artifactId}-${project.version}.war</app.location>
-                                <default.http.port>${testServerHttpPort}</default.http.port>
-                                <default.https.port>${testServerHttpsPort}</default.https.port>
+                                <default.http.port>${HttpPort}</default.http.port>
+                                <default.https.port>${HttpsPort}</default.https.port>
+                                <jwt.issuer>${jwtIssuerName}</jwt.issuer>
                             </bootstrapProperties>
                             <features>
                                 <acceptLicense>true</acceptLicense>
@@ -438,8 +441,9 @@
                             <installAppPackages>project</installAppPackages>
                             <bootstrapProperties>
                                 <app.location>${project.artifactId}-${project.version}.war</app.location>
-                                <default.http.port>${testServerHttpPort}</default.http.port>
-                                <default.https.port>${testServerHttpsPort}</default.https.port>
+                                <default.http.port>${HttpPort}</default.http.port>
+                                <default.https.port>${HttpsPort}</default.https.port>
+                                <jwt.issuer>${jwtIssuerName}</jwt.issuer>
                             </bootstrapProperties>
                             <features>
                                 <acceptLicense>true</acceptLicense>

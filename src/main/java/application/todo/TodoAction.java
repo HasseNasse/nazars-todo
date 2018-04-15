@@ -16,8 +16,6 @@ import javax.ws.rs.core.Response;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
-import org.bson.types.ObjectId;
-
 @Action
 @Path("/")
 public class TodoAction {
@@ -27,7 +25,7 @@ public class TodoAction {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @RolesAllowed({"admin"})
+//    @RolesAllowed({"admin"})
     public Response getAllTodos(){
         List<Todo> todos = todoService.findAll();
         String todosJson = jsonb.toJson(todos, List.class);

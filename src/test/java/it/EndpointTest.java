@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public class EndpointTest {
-    // TODO: 2018-02-28  Extract out to properties file
+    // TODO: 2018-02-28  FAILSAFE PROPERTIES ALWAYS RETURNING NULL!?
     protected String dns = "localhost";
     protected String port = "9080";
     protected String war = "test";
